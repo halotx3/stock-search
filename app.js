@@ -1,12 +1,24 @@
 // Initial array of stocks
-const stocks = ['FB', 'AAPL', 'TSLA', 'GOOGL'];
+const stocks = ['WWE', 'AMD', 'TSLA', 'GOOGL'];
+let validationList = [];
 
+const coUrl = 'https://api.iextrading.com/1.0/ref-data/symbols'
+$.ajax({
+  url: coUrl,
+  method: 'get'
+}).then(function(response){
+  // console.log(response)
+  for(let i = 0; i < response.length; i++){
+    validationList.push(response[i].symbol)
+  }
+  console.log(validationList)
+})
 // displaystockInfo function re-renders the HTML to display the appropriate content
 const displayStockInfo = function () {
 
   // Grab the stock symbol from the button clicked and add it to the queryURL
   const stock = $(this).attr('data-name');
-  const queryURL = `https://api.iextrading.com/1.0/stock/${stock}/batch?types=quote,news&range=1m&last=1`;
+  const queryURL = `https://api.iextrading.com/1.0/stock/${stock}/batch?types=quote,news&range=1m&last=10`;
 
   // Creating an AJAX call for the specific stock button being clicked
   $.ajax({
@@ -54,8 +66,9 @@ const displayStockInfo = function () {
     stockDiv.append(summaryHolder);
 
     // Finally adding the stockDiv to the DOM
+
     // Until this point nothing is actually displayed on our page
-    $('#stocks-view').prepend(stockDiv);
+    $('.row').prepend(stockDiv);
   });
 
 }
@@ -90,22 +103,25 @@ const render = function () {
 
 // This function handles events where one button is clicked
 const addButton = function(event) {
-
+  
   // event.preventDefault() prevents the form from trying to submit itself.
   // We're using a form so that the user can hit enter instead of clicking the button if they want
   event.preventDefault();
 
   // This line will grab the text from the input box
-  const stock = $('#stock-input').val().trim();
+  const stock = $('#stock-input').val().trim().toUpperCase();
   
-  // The stock from the text box is then added to our array
-  stocks.push(stock);
+  if(validationList.includes(stock)){
+      // The stock from the text box is then added to our array
+    stocks.push(stock);
 
   // Deletes the contents of the input
-  $('#stock-input').val('');
+    $('#stock-input').val('');
 
   // calling render which handles the processing of our stock array
-  render();
+    render();
+  }
+
 }
 
 // Even listener for #add-stock button
