@@ -3,6 +3,7 @@ const stocks = ['WWE', 'AMD', 'TSLA', 'GOOGL'];
 let validationList = [];
 
 const coUrl = 'https://api.iextrading.com/1.0/ref-data/symbols'
+
 $.ajax({
   url: coUrl,
   method: 'get'
@@ -18,7 +19,8 @@ const displayStockInfo = function () {
 
   // Grab the stock symbol from the button clicked and add it to the queryURL
   const stock = $(this).attr('data-name');
-  const queryURL = `https://api.iextrading.com/1.0/stock/${stock}/batch?types=quote,news&range=1m&last=10`;
+  const queryURL = `https://api.iextrading.com/1.0/stock/${stock}/batch?types=quote,news&range=2y&last=10`;
+  const logoURL =`https://api.iextrading.com/1.0/stock/${stock}/logo`;
 
   // Creating an AJAX call for the specific stock button being clicked
   $.ajax({
@@ -28,6 +30,17 @@ const displayStockInfo = function () {
 
     // Creating a div to hold the stock
     const stockDiv = $('<div>').addClass('stock');
+
+    $.ajax({
+      url: logoURL,
+      method: 'GET'
+    }).then(function(response){
+      let lGo = response.url;
+      console.log(lGo);
+      const holLogo = $('<img>')
+      holLogo.attr('src', `${lGo}`)
+      stockDiv.prepend(holLogo)
+    })
 
     // Storing the company name
     const companyName = response.quote.companyName;
@@ -39,13 +52,13 @@ const displayStockInfo = function () {
     stockDiv.append(nameHolder);
 
     // Storing the stock symbol
-    const stockSymbol = response.quote.symbol;
+    //const stockSymbol = response.quote.symbol;
 
     // Creating an element to display the stock symbol
-    const symbolHolder = $('<p>').text(`Stock Symbol: ${stockSymbol}`);
+    //const symbolHolder = $('<p>').text(`Stock Symbol: ${stockSymbol}`);
 
     // Appending the symbol to our stockDiv
-    stockDiv.append(symbolHolder);
+    //stockDiv.append(symbolHolder);
 
     // Storing the price
     const stockPrice = response.quote.latestPrice;
@@ -56,19 +69,28 @@ const displayStockInfo = function () {
     // Appending the price to our stockDiv
     stockDiv.append(priceHolder);
 
-    // Storing the first news summary
-    const companyNews = response.news[0].summary;
 
+    //let summaryHolder = $('<p>')
+    // Storing the first news summary
+    // for(let i = 0; i < response.news[i].length; i++){
+    //   console.log(response.news[i].summary);
+    //   let coNew = response.news[i].summary;
+    // const summaryHolder = $('<p>').text(`News Headline: ${coNew}`);
+
+    //   stockDiv.append(`<p> News Headline: ${summaryHolder}</p>`);
+    // };
+   const companyNews = response.news[0].summary;
     // Creating an element to display the news summary
     const summaryHolder = $('<p>').text(`News Headline: ${companyNews}`);
 
     // Appending the summary to our stockDiv
-    stockDiv.append(summaryHolder);
+   stockDiv.append(summaryHolder);
 
     // Finally adding the stockDiv to the DOM
 
     // Until this point nothing is actually displayed on our page
     $('.row').prepend(stockDiv);
+    console.log(response);
   });
 
 }
